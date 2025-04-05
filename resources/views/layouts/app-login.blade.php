@@ -17,6 +17,8 @@
     <!-- Bootstrap CSS -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
 
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
     <style>
         body {
             background-color: rgb(241, 241, 245);

@@ -1,5 +1,6 @@
 #!/bin/bash
 composer install --no-dev --optimize-autoloader
+npm install && npm run prod
 php artisan key:generate --force
 php artisan migrate --force
 php artisan config:cache

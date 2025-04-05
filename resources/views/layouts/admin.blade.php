@@ -27,6 +27,8 @@
 
     <!-- Estilos personalizados -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 </head>
 
 <body>
