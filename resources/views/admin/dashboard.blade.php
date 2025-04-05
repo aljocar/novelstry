@@ -64,14 +64,14 @@
                     </thead>
                     <tbody>
                         @foreach ($novels as $novel)
-                            @foreach ($novel->chapters as $chapter)
+                            @if ($novel->latestChapter)
                                 <tr>
                                     <td>{{ $novel->title }}</td>
-                                    <td>{{ $novel->user->username }}</td>
-                                    <td>{{ $chapter->title }}</td>
-                                    <td>{{ $chapter->created_at->diffForHumans() }}</td>
+                                    <td>{{ $novel->user->username ?? 'N/A' }}</td>
+                                    <td>{{ $novel->latestChapter->title }}</td>
+                                    <td>{{ $novel->latestChapter->created_at->diffForHumans() }}</td>
                                 </tr>
-                            @endforeach
+                            @endif
                         @endforeach
                     </tbody>
                 </table>

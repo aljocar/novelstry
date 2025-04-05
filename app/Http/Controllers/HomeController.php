@@ -10,16 +10,15 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Obtener las novelas que tienen al menos un capítulo, ordenadas por la fecha del último capítulo
-        $novels = Novel::with(['latestChapter'])
-            ->has('chapters')
-            ->addSelect([
-                'latest_chapter_date' => Chapter::select('created_at')
+        // Obtener novelas con su último capítulo (usando la relación latestChapter)
+        $novels = Novel::with('latestChapter')
+            ->has('chapters') // Solo novelas con al menos un capítulo
+            ->orderByDesc(
+                Chapter::select('created_at')
                     ->whereColumn('novel_id', 'novels.id')
                     ->latest()
-                    ->take(1)
-            ])
-            ->orderByDesc('latest_chapter_date')
+                    ->limit(1)
+            )
             ->paginate(10);
 
         // Top 5 novelas con más visitas

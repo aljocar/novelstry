@@ -63,13 +63,10 @@
                                             <div class="card-body">
                                                 <h5 class="card-title">{{ $novel->title }}</h5>
                                                 <!-- Mostrar información del capítulo más reciente -->
-                                                @if ($novel->chapters->isNotEmpty())
-                                                    @php
-                                                        $latestChapter = $novel->chapters->first(); // Obtener el capítulo más reciente
-                                                    @endphp
-                                                    <p class="text-muted">{{ $latestChapter->title }}</p>
-                                                    <p class="text-muted">{{ $latestChapter->created_at->diffForHumans() }}
-                                                    </p>
+                                                @if ($novel->latestChapter)
+                                                    <p class="text-muted">{{ $novel->latestChapter->title }}</p>
+                                                    <p class="text-muted">
+                                                        {{ $novel->latestChapter->created_at->diffForHumans() }}</p>
                                                 @else
                                                     <p class="text-muted">No hay capítulos disponibles</p>
                                                 @endif
@@ -81,7 +78,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="col-12 col-md-7">
@@ -109,13 +105,10 @@
                                                 style="height: 400px; object-fit: cover;">
                                             <div class="carousel-caption d-none d-md-block text-white text-shadow">
                                                 <h5 class="shadow-lg">{{ $novel->title }}</h5>
-                                                @if ($novel->chapters->isNotEmpty())
-                                                    @php
-                                                        $latestChapter = $novel->chapters->first();
-                                                    @endphp
-                                                    <p class="shadow-lg">{{ $latestChapter->title }}</p>
-                                                    <p class="shadow-lg">{{ $latestChapter->created_at->diffForHumans() }}
-                                                    </p>
+                                                @if ($novel->latestChapter)
+                                                    <p class="shadow-lg">{{ $novel->latestChapter->title }}</p>
+                                                    <p class="shadow-lg">
+                                                        {{ $novel->latestChapter->created_at->diffForHumans() }}</p>
                                                 @else
                                                     <p class="shadow-lg">No hay capítulos disponibles</p>
                                                 @endif
@@ -139,7 +132,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
         </div>

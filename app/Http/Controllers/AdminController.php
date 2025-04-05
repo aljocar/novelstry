@@ -18,24 +18,23 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        // Obtener las novelas que tienen al menos un capítulo, ordenadas por la fecha del último capítulo
-        $novels = Novel::with(['latestChapter'])
+        // Obtener las 10 novelas más recientemente actualizadas con su último capítulo
+        $novels = Novel::with(['latestChapter', 'user'])
             ->has('chapters')
-            ->addSelect([
-                'latest_chapter_date' => Chapter::select('created_at')
+            ->orderByDesc(
+                Chapter::select('created_at')
                     ->whereColumn('novel_id', 'novels.id')
                     ->latest()
-                    ->take(1)
-            ])
-            ->orderByDesc('latest_chapter_date')
+                    ->limit(1)
+            )
             ->take(10)
             ->get();
 
         // Obtener conteos
-        $novelCount = Novel::count(); // Total de novelas
-        $chapterCount = Chapter::count(); // Total de capítulos
-        $commentCount = Comment::count(); // Total de comentarios
-        $userCount = User::count(); // Total de usuarios
+        $novelCount = Novel::count();
+        $chapterCount = Chapter::count();
+        $commentCount = Comment::count();
+        $userCount = User::count();
 
         return view('admin.dashboard', compact('novels', 'novelCount', 'chapterCount', 'commentCount', 'userCount'));
     }
