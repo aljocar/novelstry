@@ -1,43 +1,19 @@
-databases:
-  - name: novelstry_db
-    databaseName: laravel
-    user: laravel_user
-    plan: free
-
 services:
   - type: web
     name: laravel-app
-    runtime: docker
-    plan: free
     env: docker
     buildCommand: "./build.sh"
     startCommand: "./start.sh"
     envVars:
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
-      - key: APP_KEY
-        fromDatabase:
-          name: laravel_db
-          key: app_key
+      - key: DB_CONNECTION
+        value: mysql
       - key: DB_HOST
-        fromDatabase:
-          name: laravel_db
-          property: host
+        value: ballast.proxy.rlwy.net:47070  # Reemplaza con tu host
       - key: DB_PORT
-        fromDatabase:
-          name: laravel_db
-          property: port
+        value: 47070  # Reemplaza con tu puerto
       - key: DB_DATABASE
-        fromDatabase:
-          name: laravel_db
-          property: database
+        value: railway
       - key: DB_USERNAME
-        fromDatabase:
-          name: laravel_db
-          property: user
+        value: root
       - key: DB_PASSWORD
-        fromDatabase:
-          name: laravel_db
-          property: password
+        sync: false  # Para que no se sobrescriba
