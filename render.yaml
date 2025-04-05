@@ -1,0 +1,43 @@
+databases:
+  - name: laravel_db
+    databaseName: laravel
+    user: laravel_user
+    plan: free
+
+services:
+  - type: web
+    name: laravel-app
+    runtime: docker
+    plan: free
+    env: docker
+    buildCommand: "./build.sh"
+    startCommand: "./start.sh"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        fromDatabase:
+          name: laravel_db
+          key: app_key
+      - key: DB_HOST
+        fromDatabase:
+          name: laravel_db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: laravel_db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: laravel_db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: laravel_db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: laravel_db
+          property: password
