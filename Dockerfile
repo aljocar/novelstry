@@ -35,6 +35,11 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # Permisos y optimización (sin acceder a DB)
 # Añade esto ANTES del CMD final:
+RUN ls -la /var/www/html/public/css/
+
+RUN chown -R www-data:www-data /var/www/html/public/css && \
+    chmod -R 755 /var/www/html/public/css
+
 RUN mkdir -p /var/www/html/storage/app/public/defaults && \
     chown -R www-data:www-data /var/www/html/storage && \
     chmod -R 775 /var/www/html/storage
