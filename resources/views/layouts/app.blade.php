@@ -12,7 +12,7 @@
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 
     <!-- Bootstrap CSS -->
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'">
 
     {{-- Bootstrap Icon --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -146,10 +146,14 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script> --}}
 
+    <!-- Al final del body -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+
     <!-- Bootstrap JS -->
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <!-- jQuery (requerido para Bootstrap) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Imagenes subir y recortar -->
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
