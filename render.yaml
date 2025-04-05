@@ -1,5 +1,5 @@
 databases:
-  - name: laravel_db
+  - name: novelstry_db
     databaseName: laravel
     user: laravel_user
     plan: free
