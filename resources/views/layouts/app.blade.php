@@ -53,6 +53,14 @@
                             <li class="nav-item ms-auto">
                                 <a class="nav-link" href="{{ route('novels.create') }}">Crear</a>
                             </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">Mis Favoritos</a>
+                            </li>
+
+                            <li class="nav-item ms-auto">
+                                <a class="nav-link" href="{{ route('login') }}">Crear</a>
+                            </li>
                         @endauth
 
                     </ul>

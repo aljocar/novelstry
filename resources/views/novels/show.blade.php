@@ -55,6 +55,10 @@
                         </a>
                     @endif
                 </div>
+            @else
+                <div class="d-grid gap-2 w-50">
+                    <a href="{{ route('login') }}" class="btn btn-secondary w-100">Añadir a favoritos +</a>
+                </div>
             @endauth
         </div>
 
