@@ -3,19 +3,14 @@ FROM composer:2 as builder
 
 WORKDIR /app
 COPY . .
-
-# 1. Forzar MySQL durante el build y evitar SQLite
-RUN echo "DB_CONNECTION=mysql" > .env && \
-    echo "DB_HOST=127.0.0.1" >> .env && \
-    composer install --no-dev --optimize-autoloader --ignore-platform-reqs && \
-    rm .env
+RUN composer install --no-dev --optimize-autoloader
 
 # Etapa de producción
 FROM php:8.2-fpm-alpine
 
 WORKDIR /var/www/html
 
-# Instalar dependencias
+# Instalar dependencias del sistema
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -25,19 +20,18 @@ RUN apk add --no-cache \
     unzip \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Configuraciones
+# Copiar configuración de Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copiar configuración de Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copiar aplicación
+# Copiar la aplicación construida
 COPY --from=builder /app /var/www/html
 COPY . .
 
-# Permisos y optimización (sin acceder a DB)
-RUN chown -R www-data:www-data storage bootstrap/cache && \
-    chmod -R 775 storage bootstrap/cache && \
-    php artisan storage:link && \
-    php artisan optimize:clear
+# Configurar permisos
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 8080
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
