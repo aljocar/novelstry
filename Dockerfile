@@ -18,8 +18,7 @@ RUN apk add --no-cache \
     libzip-dev \
     zip \
     unzip \
-    postgresql-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+    && docker-php-ext-install pdo pdo_mysql zip gd
 
 # Copiar configuración de Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
