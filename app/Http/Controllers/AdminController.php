@@ -19,16 +19,17 @@ class AdminController extends Controller
     public function dashboard()
     {
         // Obtener las novelas que tienen al menos un capítulo, ordenadas por la fecha del último capítulo
-        $novels = Novel::with(['chapters' => function ($query) {
-            $query->latest()->limit(10); // Cargar todos los capítulos, ordenados por el más reciente
-        }])
-            ->has('chapters') // Solo novelas con al menos un capítulo
-            ->join('chapters', 'novels.id', '=', 'chapters.novel_id') // Unir con la tabla chapters
-            ->orderBy('chapters.created_at', 'desc') // Ordenar por la fecha del último capítulo
-            ->select('novels.*') // Seleccionar solo las columnas de la tabla novels
-            ->distinct() // Evitar duplicados
-            ->limit(10) // Limitar a 10 resultados
-            ->get(); // Obtener los resultados
+        $novels = Novel::with(['latestChapter'])
+            ->has('chapters')
+            ->addSelect([
+                'latest_chapter_date' => Chapter::select('created_at')
+                    ->whereColumn('novel_id', 'novels.id')
+                    ->latest()
+                    ->take(1)
+            ])
+            ->orderByDesc('latest_chapter_date')
+            ->take(10)
+            ->get();
 
         // Obtener conteos
         $novelCount = Novel::count(); // Total de novelas

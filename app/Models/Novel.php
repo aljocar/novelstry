@@ -70,6 +70,11 @@ class Novel extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function latestChapter()
+    {
+        return $this->hasOne(Chapter::class)->latestOfMany();
+    }
+
     // Relación con la novela que pertenece el capitulo
     public function chapters()
     {
