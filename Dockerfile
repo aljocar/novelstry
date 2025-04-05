@@ -3,8 +3,7 @@ FROM composer:2 as builder
 
 WORKDIR /app
 COPY . .
-RUN composer install --no-dev --optimize-autoloader --no-scripts && \
-    composer dump-autoload
+RUN composer install --no-dev --optimize-autoloader
 
 # Etapa de producción
 FROM php:8.2-fpm-alpine
