@@ -5,11 +5,6 @@
 /public/storage
 /storage/*.key
 /storage/pail
-
-!/storage/app/public/.gitkeep  # Para mantener la carpeta
-!/storage/app/public/defaults/default_cover.jpg
-!/storage/app/public/defaults/default_avatar.jpg
-
 /vendor
 .env
 .env.backup
