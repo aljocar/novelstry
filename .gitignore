@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/storage/app/public/*
 /storage/*.key
 /storage/pail
 /vendor
@@ -21,3 +22,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Y añade esto:
+!/storage/app/public/defaults/default_cover.jpg

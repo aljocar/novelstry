@@ -34,6 +34,11 @@ COPY . .
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Permisos y optimización (sin acceder a DB)
+# Añade esto ANTES del CMD final:
+RUN mkdir -p /var/www/html/storage/app/public/defaults && \
+    chown -R www-data:www-data /var/www/html/storage && \
+    chmod -R 775 /var/www/html/storage
+    
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache && \
     php artisan storage:link
