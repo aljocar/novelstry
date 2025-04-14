@@ -106,12 +106,23 @@ class NovelController extends Controller
                 ->with('error', 'No puedes tener más de 15 novelas al mismo tiempo.');
         }
 
-        // Manejo de la imagen
-        $coverUrl = asset('https://i.imgur.com/OqeisHs.jpg'); // URL por defecto
-
+        // Validar que la imagen se subió correctamente a Imgur
         if ($request->cropped_image) {
-            $imgurService = app(ImgurService::class);
-            $coverUrl = $imgurService->uploadBase64Image($request->cropped_image) ?? $coverUrl;
+            try {
+                $imgurService = app(ImgurService::class);
+                $coverUrl = $imgurService->uploadBase64Image($request->cropped_image);
+
+                if (!$coverUrl) {
+                    throw new \Exception("No se pudo subir la imagen a Imgur.");
+                }
+            } catch (\Exception $e) {
+                return redirect()
+                    ->back()
+                    ->withInput()  // Mantiene los datos del formulario
+                    ->with('error', 'Error al subir la imagen a Imgur: ' . $e->getMessage());
+            }
+        } else {
+            $coverUrl = asset('https://i.imgur.com/OqeisHs.jpg'); // Imagen por defecto si no hay imagen
         }
 
         // Crear novela
@@ -129,7 +140,7 @@ class NovelController extends Controller
                 'success' => true,
                 'titulo' => $novel->title,
                 'cover' => $novel->cover_image,
-                'novel_id' => $novel->id
+                'novel_id' => $novel
             ]);
     }
 
