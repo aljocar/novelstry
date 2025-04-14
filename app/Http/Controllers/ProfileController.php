@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Novel;
 use App\Models\User;
 use App\Models\UserMetadata;
+use App\Services\ImgurService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
@@ -81,39 +83,58 @@ class ProfileController extends Controller
             abort(403, 'No tienes permiso para editar esta cuenta.');
         }
 
-        // Validar los datos del formulario
-        $request->validate([
-            'username' => 'required|string|min:5|max:20|unique:users,username,' . $user->id,
-            'current_password' => 'required|string|min:4', // Validar la contraseña actual
+        // Reglas de validación condicionales
+        $rules = [
+            'username' => [
+                'required',
+                'string',
+                'min:5',
+                'max:20',
+                Rule::unique('users', 'username')->ignore($user->id)
+            ],
             'password' => 'nullable|string|min:4|confirmed',
-        ], [
-            // Mensajes de Error
-            'username.required' => 'El usuario es obligatorio.',
-            'username.min' => 'El usuario debe tener al menos 5 caracteres.',
-            'username.max' => 'El usuario debe tener máximo 20 caracteres.',
-            'username.unique' => 'El usuario ya existe.',
-            'current_password.required' => 'La contraseña actual es obligatoria.',
-            'current_password.min' => 'La contraseña actual debe tener al menos 4 caracteres.',
-            'password.min' => 'La nueva contraseña debe tener al menos 4 caracteres.',
-            'password.confirmed' => 'La contraseña de confirmación no coincide.',
-        ]);
+        ];
 
-        // Verificar que la contraseña actual sea correcta
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta.'])->withInput();
+        // Solo validar current_password si se está cambiando la contraseña
+        $messages = [
+            'username.required' => 'El nombre de usuario es obligatorio.',
+            'username.min' => 'El nombre de usuario debe tener al menos 5 caracteres.',
+            'username.max' => 'El nombre de usuario no puede exceder los 20 caracteres.',
+            'username.unique' => 'Este nombre de usuario ya está en uso.',
+            'password.min' => 'La nueva contraseña debe tener al menos 4 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ];
+
+        if ($request->filled('password')) {
+            $rules['current_password'] = 'required|string|min:4';
+            $messages['current_password.required'] = 'La contraseña actual es obligatoria para cambiar la contraseña.';
+            $messages['current_password.min'] = 'La contraseña actual debe tener al menos 4 caracteres.';
         }
 
-        // Actualizar los datos del usuario
-        $user->username = $request->username;
+        // Validar los datos
+        $validatedData = $request->validate($rules, $messages);
 
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
+        // Verificar contraseña actual solo si se está cambiando la contraseña
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()
+                    ->withErrors(['current_password' => 'La contraseña actual es incorrecta.'])
+                    ->withInput();
+            }
+        }
+
+        // Actualizar los datos
+        $user->username = $validatedData['username'];
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validatedData['password']);
         }
 
         $user->save();
 
-        // Redirigir al perfil con un mensaje de éxito
-        return redirect()->route('profiles.show', $user->username)
+        // Redirigir con mensaje de éxito
+        return redirect()
+            ->route('profiles.show', $user->username)
             ->with('success', 'Perfil actualizado correctamente.');
     }
 
@@ -147,14 +168,6 @@ class ProfileController extends Controller
             return redirect()->back()->withErrors(['confirmDelete' => 'Debes escribir "Eliminar" para confirmar.']);
         }
 
-        // Eliminar la imagen de portada si no es la imagen por defecto
-        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
-            // Verificar si la imagen no es la imagen por defecto
-            if ($user->profile_image !== 'defaults/default_cover.jpg') {
-                Storage::disk('public')->delete($user->profile_image);
-            }
-        }
-
         // Cerrar la sesión del usuario antes de eliminar la cuenta
         Auth::logout();
 
@@ -176,7 +189,7 @@ class ProfileController extends Controller
         return view('profiles.image.edit', compact('users'));
     }
 
-    public function imageUpdate(Request $request, $username)
+    public function imageUpdate(Request $request, $username, ImgurService $imgurService)
     {
         // Obtener el usuario autenticado
         $user = Auth::user();
@@ -229,32 +242,22 @@ class ProfileController extends Controller
                 ->withInput();
         }
 
-        // Manejar la imagen de avatar
+        // Manejar la imagen de avatar con Imgur
         if ($request->cropped_image) {
-            // Eliminar la imagen anterior solo si no es la imagen por defecto
-            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
-                if ($user->profile_image !== 'defaults/default_avatar.jpg') {
-                    Storage::disk('public')->delete($user->profile_image);
-                }
+            $imgurUrl = $imgurService->uploadBase64Image($request->cropped_image);
+
+            if ($imgurUrl) {
+                // Actualizar con la nueva URL de Imgur
+                $user->profile_image = $imgurUrl;
+                $user->save();
+            } else {
+                return redirect()->back()
+                    ->with('error', 'No se pudo actualizar la imagen de perfil. Inténtalo nuevamente.')
+                    ->withInput();
             }
-
-            // Convertir la imagen base64 a un archivo
-            $croppedImage = $request->cropped_image;
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $croppedImage));
-
-            // Generar un nombre único para la imagen (usando UUID)
-            $imageName = 'avatars/' . Str::uuid() . '.jpg'; // Ejemplo: avatars/550e8400-e29b-41d4-a716-446655440000.jpg
-
-            // Guardar la imagen en el disco público
-            Storage::disk('public')->put($imageName, $imageData);
-
-            // Actualizar la ruta de la imagen en la base de datos
-            $user->profile_image = $imageName;
-            $user->save();
         }
 
-        // Redirigir al perfil con un mensaje de éxito
         return redirect()->route('profiles.show', $user->username)
-            ->with('success', 'Perfil actualizado correctamente.');
+            ->with('success', 'Foto de perfil actualizada correctamente.');
     }
 }

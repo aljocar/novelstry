@@ -36,7 +36,7 @@
 
                 <!-- Mostrar la imagen actual -->
                 @if ($user->profile_image)
-                    <img id="image-preview" src="{{ asset('storage/' . $user->profile_image) }}" alt="Preview"
+                    <img id="image-preview" src="{{ $user->profile_image }}" alt="Preview"
                         style="max-width: 50%; margin-top: 10px;">
                 @else
                     <img id="image-preview" src="#" alt="Preview"

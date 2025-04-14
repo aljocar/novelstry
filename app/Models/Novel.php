@@ -28,6 +28,23 @@ class Novel extends Model
         return 'slug';
     }
 
+    // app/Models/Novel.php
+    public function getCoverImageUrlAttribute()
+    {
+        // Si es una URL de Imgur (contiene "imgur.com")
+        if (str_contains($this->cover_image, 'imgur.com')) {
+            return $this->cover_image;
+        }
+
+        // Si es una ruta local pero no empieza con http
+        if ($this->cover_image && !str_starts_with($this->cover_image, 'http')) {
+            return asset('storage/' . $this->cover_image);
+        }
+
+        // Imagen por defecto
+        return asset('defaults/default_cover.jpg');
+    }
+
     protected static function boot()
     {
         parent::boot();

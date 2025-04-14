@@ -15,8 +15,7 @@
 
         <!-- Parte izquierda (5 columnas en pantallas grandes, 12 en móviles) -->
         <div class="col-md-5 col-12 mb-4">
-            <img src="{{ asset('storage/' . $novel->cover_image) }}" class="img-fluid shadow mb-4 w-50"
-                alt="Portada de {{ $novel->title }}">
+            <img src="{{ $novel->cover_image }}" class="img-fluid shadow mb-4 w-50" alt="{{ $novel->title }}">
 
             <h2>{{ $novel->title }}</h2>
             <p>
@@ -90,7 +89,7 @@
     <hr class="my-4"> <!-- Línea horizontal con margen arriba y abajo -->
 
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6 col-lg-6 mb-4">
 
             <a href="{{ route('chapters.index', $novel) }}" class="btn p-0" style="text-align: left;">
                 <div class="card text-muted">

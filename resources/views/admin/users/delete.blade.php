@@ -61,7 +61,7 @@
                         <!-- Enlace que cubre toda la tarjeta -->
                         <div class="card h-100"> <!-- h-100 para que todas las tarjetas tengan la misma altura -->
                             @if ($novel->cover_image)
-                                <img src="{{ asset('storage/' . $novel->cover_image) }}" class="card-img-top img-fluid"
+                                <img src="{{ $novel->cover_image }}" class="card-img-top img-fluid"
                                     alt="{{ $novel->title }}" style="max-width: 100%;" width="625" height="1000">
                             @else
                                 <img src="https://via.placeholder.com/150" class="card-img-top img-fluid"

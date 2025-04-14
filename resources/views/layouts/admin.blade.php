@@ -83,7 +83,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
                                     <strong>
-                                        <img src="{{ asset('storage/' . $user->profile_image) }}" class="img-fluid shadow"
+                                        <img src="{{ $user->profile_image }}" class="img-fluid shadow"
                                             width="30px" alt="Imagen de Perfil">
                                         {{ Auth::user()->username }}
                                     </strong> <!-- Mostrar el nombre de usuario -->

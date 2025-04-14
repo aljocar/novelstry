@@ -27,7 +27,7 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'profile_image' => 'defaults/default_avatar.jpg',
+            'profile_image' => 'https://i.imgur.com/8h8Lu67.png',
         ];
     }
 }

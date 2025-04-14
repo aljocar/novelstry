@@ -31,7 +31,7 @@
                 @endauth
             </div>
 
-            <img src="{{ asset('storage/' . $user->profile_image) }}" class="img-fluid shadow mt-3 mb-3" width="200px"
+            <img src="{{ $user->profile_image }}" class="img-fluid shadow mt-3 mb-3" width="200px"
                 alt="Imagen de Perfil">
 
             <div class="card border-0">
@@ -80,12 +80,12 @@
             @else
                 <div class="row">
                     @foreach ($novels as $novel)
-                        <div class="col-3 col-md-2 mb-4">
+                        <div class="col-6 col-md-2 mb-4">
                             <a href="{{ route('novels.show', $novel) }}" class="text-decoration-none text-dark">
                                 <!-- Enlace que cubre toda la tarjeta -->
                                 <div class="card h-100"> <!-- h-100 para que todas las tarjetas tengan la misma altura -->
                                     @if ($novel->cover_image)
-                                        <img src="{{ asset('storage/' . $novel->cover_image) }}"
+                                        <img src="{{ $novel->cover_image }}"
                                             class="card-img-top img-fluid" alt="{{ $novel->title }}"
                                             style="max-width: 100%;" width="625" height="1000">
                                     @else

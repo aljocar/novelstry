@@ -53,7 +53,7 @@
                                     <a href="{{ route('novels.show', $novel) }}" class="text-decoration-none text-dark">
                                         <div class="card h-100">
                                             @if ($novel->cover_image)
-                                                <img src="{{ asset('storage/' . $novel->cover_image) }}"
+                                                <img src="{{ $novel->cover_image }}"
                                                     class="card-img-top img-fluid" alt="{{ $novel->title }}"
                                                     style="max-width: 100%;" width="625" height="1000">
                                             @else
@@ -100,7 +100,7 @@
                                 <div class="carousel-inner">
                                     @foreach ($novels as $novel)
                                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                            <img src="{{ $novel->cover_image ? asset('storage/' . $novel->cover_image) : 'https://via.placeholder.com/800x400' }}"
+                                            <img src="{{ $novel->cover_image }}"
                                                 class="d-block w-100" alt="{{ $novel->title }}"
                                                 style="height: 400px; object-fit: cover;">
                                             <div class="carousel-caption d-none d-md-block text-white text-shadow">

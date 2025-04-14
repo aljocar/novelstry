@@ -50,7 +50,7 @@
                                 <a class="nav-link" href="{{ route('favorites.index') }}">Mis Favoritos</a>
                             </li>
 
-                            <li class="nav-item ms-auto">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ route('novels.create') }}">Crear</a>
                             </li>
                         @else
@@ -58,7 +58,7 @@
                                 <a class="nav-link" href="{{ route('login') }}">Mis Favoritos</a>
                             </li>
 
-                            <li class="nav-item ms-auto">
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">Crear</a>
                             </li>
                         @endauth
@@ -78,7 +78,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                     aria-expanded="false">
                                     <strong>
-                                        <img src="{{ asset('storage/' . $user->profile_image) }}" class="img-fluid shadow"
+                                        <img src="{{ $user->profile_image }}" class="img-fluid shadow"
                                             width="30px" alt="Imagen de Perfil">
                                         {{ Auth::user()->username }}
                                     </strong> <!-- Mostrar el nombre de usuario -->

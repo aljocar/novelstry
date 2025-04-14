@@ -36,7 +36,7 @@
 
         <div class="row">
             <!-- Contenedor para los gráficos -->
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="novelsPerUserChart" class="chart-container"></div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="commentsPerUserChart" class="chart-container"></div> <!-- Cambiado aquí -->
@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="comparisonChart" class="chart-container"></div>
@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="visitsPerNovelChart" class="chart-container"></div>
@@ -68,7 +68,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="favoritesPerNovelChart" class="chart-container"></div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="chaptersPerNovelChart" class="chart-container"></div>
@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="visitsPieChart" class="chart-container"></div>
@@ -92,7 +92,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
+            <div class="col-12 col-md-6 mb-4">
                 <div class="card">
                     <div class="card-body">
                         <div id="novelsPerCategoryChart" class="chart-container"></div>
@@ -101,6 +101,48 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* CSS para móviles */
+        @media (max-width: 767.98px) {
+            .chart-container {
+                min-height: 400px !important;
+                /* Altura mínima mayor para móviles */
+                transform: scale(1.1);
+                /* Opcional: Escalar ligeramente el contenido */
+                transform-origin: top left;
+                width: 120% !important;
+                margin-left: -10%;
+            }
+
+            .card {
+                overflow: visible !important;
+                /* Permitir que el escalado se vea completo */
+            }
+
+            .card-body {
+                overflow-x: auto;
+                /* Scroll horizontal si es necesario */
+                padding: 0.5rem !important;
+            }
+        }
+
+        /* Restaurar estilo normal en desktop */
+        @media (min-width: 768px) {
+            .col-md-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .chart-container {
+                min-height: 300px;
+            }
+
+            .card-body {
+                padding: 1.25rem;
+            }
+        }
+    </style>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {

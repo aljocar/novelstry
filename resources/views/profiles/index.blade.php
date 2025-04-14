@@ -34,12 +34,12 @@
 
         <div class="row">
             @foreach ($users as $user)
-                <div class="col-3 col-md-2 mb-4"> <!-- Ajusta las columnas según el diseño -->
+                <div class="col-6 col-md-2 mb-4"> <!-- Ajusta las columnas según el diseño -->
                     <a href="{{ route('profiles.show', $user->username) }}" class="text-decoration-none text-dark">
                         <div class="card h-100 shadow-sm"> <!-- Agrega sombra y altura fija -->
                             <div class="card-body text-center p-3"> <!-- Centra el contenido y agrega relleno -->
                                 @if ($user->profile_image)
-                                    <img src="{{ asset('storage/' . $user->profile_image) }}" 
+                                    <img src="{{ $user->profile_image }}" 
                                          class="img-fluid rounded-circle mb-3" 
                                          alt="{{ $user->username }}" 
                                          style="width: 100px; height: 100px; object-fit: cover;"> <!-- Imagen redonda y tamaño fijo -->

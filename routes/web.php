@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
         // Editar Imagen de perfil
         Route::get('/profile/{username}/image/edit', [ProfileController::class, 'imageEdit'])
             ->name('profiles.image.edit');
-        Route::put('/profile/{username}', [ProfileController::class, 'imageUpdate'])
+        Route::put('/profile/{username}/image', [ProfileController::class, 'imageUpdate'])
             ->name('profiles.image.update');
 
 

@@ -36,7 +36,7 @@ class AuthController extends Controller
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type ?? 1, // Por defecto, usuario normal
-            'profile_image' => 'defaults/default_avatar.jpg',
+            'profile_image' => 'https://i.imgur.com/8h8Lu67.png',
         ]);
 
         Auth::login($user);

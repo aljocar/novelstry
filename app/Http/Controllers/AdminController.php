@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Novel;
 use App\Models\User;
 use App\Models\UserMetadata;
+use App\Services\ImgurService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +54,7 @@ class AdminController extends Controller
         return view('admin.users.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ImgurService $imgurService)
     {
         if (auth()->user()->user_type != 2) {
             return redirect()->route('novels.index')->with('errorAdmin', 'No tienes el permiso necesario.');
@@ -122,22 +123,19 @@ class AdminController extends Controller
                 ->withInput();
         }
 
-        // Manejar la imagen de perfil
-        $profileImagePath = 'defaults/default_avatar.jpg'; // Valor por defecto
+        // Manejar la imagen de perfil con Imgur
+        $profileImageUrl = 'https://i.imgur.com/8h8Lu67.png'; // URL por defecto
 
         if ($request->cropped_image) {
-            // Convertir la imagen base64 a un archivo
-            $croppedImage = $request->cropped_image;
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $croppedImage));
+            $imgurUrl = $imgurService->uploadBase64Image($request->cropped_image);
 
-            // Generar un nombre único para la imagen
-            $imageName = 'avatars/' . Str::uuid() . '.jpg'; // Ejemplo: avatars/550e8400-e29b-41d4-a716-446655440000.jpg
-
-            // Guardar la imagen en el disco público
-            Storage::disk('public')->put($imageName, $imageData);
-
-            // Actualizar la ruta de la imagen
-            $profileImagePath = $imageName;
+            if ($imgurUrl) {
+                $profileImageUrl = $imgurUrl;
+            } else {
+                return redirect()->back()
+                    ->with('error', 'No se pudo subir la imagen de perfil. Inténtalo nuevamente.')
+                    ->withInput();
+            }
         }
 
         // Crear el usuario
@@ -145,7 +143,7 @@ class AdminController extends Controller
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
-            'profile_image' => $profileImagePath, // Usar la imagen recortada o la de por defecto
+            'profile_image' => $profileImageUrl, // Usamos la URL de Imgur
         ]);
 
         // Crear la metadata asociada al usuario
@@ -177,7 +175,7 @@ class AdminController extends Controller
         return view('admin.users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, ImgurService $imgurService)
     {
         // Verificar si el usuario autenticado es un administrador
         if (auth()->user()->user_type != 2) {
@@ -240,30 +238,26 @@ class AdminController extends Controller
                 ->withInput();
         }
 
-        // Manejar la imagen de perfil
-        if ($request->cropped_image) {
-            // Eliminar la imagen anterior si no es la imagen por defecto
-            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
-                if ($user->profile_image !== 'defaults/default_avatar.jpg') {
-                    Storage::disk('public')->delete($user->profile_image);
-                }
-            }
+        // Manejar la imagen de perfil con Imgur
+        $profileImageUrl = $user->profile_image; // Mantener la imagen actual por defecto
 
-            // Guardar la nueva imagen
-            $croppedImage = $request->cropped_image;
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $croppedImage));
-            $imageName = 'avatars/' . Str::uuid() . '.jpg';
-            Storage::disk('public')->put($imageName, $imageData);
-            $profileImagePath = $imageName;
-        } else {
-            $profileImagePath = $user->profile_image;
+        if ($request->cropped_image) {
+            $imgurUrl = $imgurService->uploadBase64Image($request->cropped_image);
+
+            if ($imgurUrl) {
+                $profileImageUrl = $imgurUrl;
+            } else {
+                return redirect()->back()
+                    ->with('error', 'No se pudo actualizar la imagen de perfil. Inténtalo nuevamente.')
+                    ->withInput();
+            }
         }
 
-        // Actualizar el usuario
+        // Preparar datos del usuario
         $userData = [
             'username' => $request->username,
             'user_type' => $request->user_type,
-            'profile_image' => $profileImagePath,
+            'profile_image' => $profileImageUrl,
         ];
 
         // Actualizar la contraseña solo si se proporciona una nueva
@@ -321,14 +315,6 @@ class AdminController extends Controller
         // Validar que el campo de confirmación tenga el valor correcto
         if (request('confirmDelete') !== 'Eliminar') {
             return redirect()->back()->withErrors(['confirmDelete' => 'Debes escribir "Eliminar" para confirmar.']);
-        }
-
-        // Eliminar la imagen de portada si no es la imagen por defecto
-        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
-            // Verificar si la imagen no es la imagen por defecto
-            if ($user->profile_image !== 'defaults/default_cover.jpg') {
-                Storage::disk('public')->delete($user->profile_image);
-            }
         }
 
         $user->delete();

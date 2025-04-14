@@ -32,7 +32,7 @@
                         <a href="{{ route('novels.show', $novel) }}" class="text-decoration-none text-dark">
                             <div class="card h-100">
                                 @if ($novel->cover_image)
-                                    <img src="{{ asset('storage/' . $novel->cover_image) }}" class="card-img-top img-fluid"
+                                    <img src="{{ $novel->cover_image }}" class="card-img-top img-fluid"
                                         alt="{{ $novel->title }}" style="max-width: 100%;" width="625" height="1000">
                                 @else
                                     <img src="https://via.placeholder.com/150" class="card-img-top img-fluid"

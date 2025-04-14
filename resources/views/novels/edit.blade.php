@@ -41,7 +41,7 @@
                 <input type="hidden" id="cropped_image" name="cropped_image">
                 <!-- Mostrar la imagen actual -->
                 @if ($novel->cover_image)
-                    <img id="image-preview" src="{{ asset('storage/' . $novel->cover_image) }}" alt="Preview"
+                    <img id="image-preview" src="{{ $novel->cover_image }}" alt="Preview"
                         style="max-width: 50%; margin-top: 10px;">
                 @else
                     <img id="image-preview" src="#" alt="Preview"

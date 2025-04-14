@@ -24,7 +24,7 @@ class NovelFactory extends Factory
             'title' => $title,
             'slug' => Str::slug($title), // Slug basado en el título
             'synopsis' => $this->faker->paragraph(3), // Sinopsis de 3 párrafos
-            'cover_image' => 'defaults/default_cover.jpg',
+            'cover_image' => 'https://i.imgur.com/OqeisHs.jpg',
             'user_id' => 1,
         ];
     }

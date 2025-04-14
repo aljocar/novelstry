@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Services\ImgurService;
 
 class NovelController extends Controller
 {
@@ -105,34 +106,31 @@ class NovelController extends Controller
                 ->with('error', 'No puedes tener más de 15 novelas al mismo tiempo.');
         }
 
-        // Manejar la imagen de portada
-        $coverImagePath = 'defaults/default_cover.jpg'; // Valor por defecto
+        // Manejo de la imagen
+        $coverUrl = asset('https://i.imgur.com/OqeisHs.jpg'); // URL por defecto
 
         if ($request->cropped_image) {
-            $croppedImage = $request->cropped_image;
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $croppedImage));
-            $imageName = 'cover_' . Str::uuid() . '.jpg';
-            Storage::disk('public')->put('covers/' . $imageName, $imageData);
-            $coverImagePath = 'covers/' . $imageName;
+            $imgurService = app(ImgurService::class);
+            $coverUrl = $imgurService->uploadBase64Image($request->cropped_image) ?? $coverUrl;
         }
 
-        // Crear la novela
+        // Crear novela
         $novel = Novel::create([
             'title' => $request->title,
             'synopsis' => $request->synopsis,
-            'user_id' => auth()->id(),
-            'cover_image' => $coverImagePath,
+            'user_id' => Auth::id(),
+            'cover_image' => $coverUrl,
         ]);
 
-        // Guardar las categorías seleccionadas en la tabla pivote
         $novel->categories()->attach($request->categories);
 
-        // Mensaje de éxito con HTML
         return redirect()->route('novels.index', $novel)
-            ->with('success', true)
-            ->with('titulo', $novel->title)
-            ->with('cover', $novel->cover_image)
-            ->with('novel_id', $novel);
+            ->with([
+                'success' => true,
+                'titulo' => $novel->title,
+                'cover' => $novel->cover_image,
+                'novel_id' => $novel->id
+            ]);
     }
 
     public function show(Request $request, Novel $novel)
@@ -183,7 +181,7 @@ class NovelController extends Controller
         return view('novels.edit', compact('novel', 'fromTable', 'categories'));
     }
 
-    public function update(Request $request, Novel $novel)
+    public function update(Request $request, Novel $novel, ImgurService $imgurService)
     {
         // Verificar si el usuario autenticado es el creador de la novela o un administrador
         if ($novel->user_id !== auth()->id() && auth()->user()->user_type != 2) {
@@ -235,32 +233,25 @@ class NovelController extends Controller
 
         // Manejar la imagen de portada
         if ($request->cropped_image) {
-            // Eliminar la imagen anterior solo si no es la imagen por defecto
-            if ($novel->cover_image && Storage::disk('public')->exists($novel->cover_image)) {
-                if ($novel->cover_image !== 'defaults/default_cover.jpg') {
-                    Storage::disk('public')->delete($novel->cover_image);
-                }
+            // Subir la nueva imagen a Imgur
+            $imgurUrl = $imgurService->uploadBase64Image($request->cropped_image);
+
+            if ($imgurUrl) {
+                // Actualizar con la nueva URL de Imgur
+                $novel->cover_image = $imgurUrl;
+            } else {
+                // Si falla la subida, mantener la imagen actual
+                return redirect()->back()
+                    ->with('error', 'No se pudo actualizar la imagen de portada. Inténtalo nuevamente.')
+                    ->withInput();
             }
-
-            // Convertir la imagen base64 a un archivo
-            $croppedImage = $request->cropped_image;
-            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $croppedImage));
-
-            // Generar un nombre único para la imagen (usando UUID)
-            $imageName = 'cover_' . Str::uuid() . '.jpg';
-
-            // Guardar la imagen en el disco público
-            Storage::disk('public')->put('covers/' . $imageName, $imageData);
-
-            // Actualizar la ruta de la imagen
-            $novel->cover_image = 'covers/' . $imageName;
         }
 
         // Actualizar los demás campos
         $novel->update([
             'title' => $request->title,
             'synopsis' => $request->synopsis,
-            'cover_image' => $novel->cover_image, // Actualizar la ruta de la imagen si cambió
+            // cover_image ya se actualizó arriba si hubo cambio
         ]);
 
         // Sincronizar las categorías seleccionadas
@@ -291,14 +282,6 @@ class NovelController extends Controller
         // Validar que el campo de confirmación tenga el valor correcto
         if (request('confirmDelete') !== 'Eliminar') {
             return redirect()->back()->withErrors(['confirmDelete' => 'Debes escribir "Eliminar" para confirmar.']);
-        }
-
-        // Eliminar la imagen de portada si no es la imagen por defecto
-        if ($novel->cover_image && Storage::disk('public')->exists($novel->cover_image)) {
-            // Verificar si la imagen no es la imagen por defecto
-            if ($novel->cover_image !== 'defaults/default_cover.jpg') {
-                Storage::disk('public')->delete($novel->cover_image);
-            }
         }
 
         $novel->delete();

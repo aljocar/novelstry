@@ -46,7 +46,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Imagen de Perfil</h5>
-                <img src="{{ asset('storage/' . $users->profile_image) }}" class="img-fluid shadow mt-3 mb-3" width="100px" alt="Imagen de Perfil">
+                <img src="{{ $users->profile_image }}" class="img-fluid shadow mt-3 mb-3" width="100px" alt="Imagen de Perfil">
                 <p class="card-text">Aquí puedes editar la imagen de tu perfil.</p>
                 <a href="{{ route('profiles.image.edit', Auth::user()->username) }}" class="btn btn-secondary">Editar Imagen</a>
             </div>

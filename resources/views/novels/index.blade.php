@@ -25,8 +25,8 @@
                         $cover = session('cover');
                     @endphp
 
-                    <img src="{{ asset('storage/' . $cover) }}" class="img-fluid shadow mb-3 ms-3" style="max-width: 50%;"
-                        width="625" height="1000">
+                    <img src="{{ $cover }}" class="img-fluid shadow mb-3 ms-3" style="max-width: 50%;" width="625"
+                        height="1000">
 
                     <div class="modal-footer">
                         <a href="{{ route('novels.show', session('novel_id')) }}" class="btn btn-primary">Ver novela</a>
@@ -70,7 +70,7 @@
                         <!-- Enlace que cubre toda la tarjeta -->
                         <div class="card h-100"> <!-- h-100 para que todas las tarjetas tengan la misma altura -->
                             @if ($novel->cover_image)
-                                <img src="{{ asset('storage/' . $novel->cover_image) }}" class="card-img-top img-fluid"
+                                <img src="{{ $novel->cover_image }}" class="card-img-top img-fluid"
                                     alt="{{ $novel->title }}" style="max-width: 100%;" width="625" height="1000">
                             @else
                                 <img src="https://via.placeholder.com/150" class="card-img-top img-fluid"

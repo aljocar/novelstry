@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <!-- Nombre de usuario -->
         <h3 class="card-title">Editar Cuenta</h3>
-    
+
         <a href="{{ route('profiles.config', Auth::user()->username) }}" class="mb-3 btn btn-secondary">Volver</a>
     </div>
 
@@ -47,13 +47,13 @@
             <div class="form-label col-12 col-md-4 mb-4">
                 <label for="current_password">Contraseña actual</label>
                 <div class="input-group">
-                    <input type="password" id="current_password" name="current_password" class="form-control" required>
+                    <input type="password" id="current_password" name="current_password" class="form-control">
                     <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
                         <i class="bi bi-eye"></i> <!-- Ícono de ojo cerrado -->
                     </button>
                 </div>
             </div>
-        
+
             <!-- Campo para la nueva contraseña -->
             <div class="form-label col-12 col-md-4 mb-4">
                 <label for="password">Nueva contraseña</label>
@@ -64,7 +64,7 @@
                     </button>
                 </div>
             </div>
-        
+
             <!-- Campo para confirmar la nueva contraseña -->
             <div class="form-label col-12 col-md-4 mb-4">
                 <label for="password_confirmation">Confirmar nueva contraseña</label>
@@ -80,5 +80,30 @@
         <button type="submit" class="form-control btn btn-primary">Actualizar Perfil</button>
     </form>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordFields = document.getElementById('passwordFields');
+            const currentPasswordField = document.getElementById('current_password');
+            const passwordField = document.getElementById('password');
+            const passwordConfirmField = document.getElementById('password_confirmation');
+
+            // Inicialmente deshabilitados
+            [currentPasswordField, passwordField, passwordConfirmField].forEach(field => {
+                field.disabled = true;
+            });
+
+            // Cuando se muestra la sección de contraseñas
+            document.querySelector('[data-bs-target="#passwordFields"]').addEventListener('click', function() {
+                const isCollapsed = !passwordFields.classList.contains('show');
+
+                [currentPasswordField, passwordField, passwordConfirmField].forEach(field => {
+                    field.disabled = !isCollapsed;
+                    if (!isCollapsed) {
+                        field.value = ''; // Limpiar campos al colapsar
+                    }
+                });
+            });
+        });
+    </script>
 
 @endsection
