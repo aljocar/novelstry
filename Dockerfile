@@ -34,7 +34,6 @@ COPY . .
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Permisos y optimización (sin acceder a DB)
-# Añade esto ANTES del CMD final:
 RUN ls -la /var/www/html/public/css/
 
 RUN chown -R www-data:www-data /var/www/html/public/css && \
