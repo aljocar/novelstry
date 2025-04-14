@@ -3,7 +3,11 @@ FROM composer:2 as builder
 
 WORKDIR /app
 COPY . .
-RUN composer install --no-dev --optimize-autoloader
+
+# Crea el directorio bootstrap/cache con permisos antes de composer install
+RUN mkdir -p /app/bootstrap/cache && \
+    chmod -R 775 /app/bootstrap/cache && \
+    composer install --no-dev --optimize-autoloader
 
 # Etapa de producción
 FROM php:8.2-fpm-alpine
@@ -25,7 +29,7 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY --from=builder /app /var/www/html
 
-# Permisos
+# Permisos (ahora solo para producción)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -38,9 +42,6 @@ ENV CACHE_DRIVER=array \
 RUN php artisan config:clear && \
     php artisan view:clear && \
     php artisan storage:link
-
-# Limpieza opcional (ignora errores)
-RUN php artisan cache:clear --no-interaction 2>/dev/null || true
 
 EXPOSE 8080
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
