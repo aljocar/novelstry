@@ -20,33 +20,31 @@ RUN apk add --no-cache \
     unzip \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Copiar configuración de Nginx
+# Copiar configuración de Nginx y Supervisor
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-# Copiar configuración de Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copiar la aplicación construida
 COPY --from=builder /app /var/www/html
 COPY . .
 
-# Configurar permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Configurar permisos (sin ejecutar Artisan todavía)
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
+    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Permisos y optimización (sin acceder a DB)
-# Añade esto ANTES del CMD final:
-RUN ls -la /var/www/html/public/css/
-
-RUN chown -R www-data:www-data /var/www/html/public/css && \
-    chmod -R 755 /var/www/html/public/css
-
+# Crear directorios necesarios (ej: para imágenes por defecto)
 RUN mkdir -p /var/www/html/storage/app/public/defaults && \
-    chown -R www-data:www-data /var/www/html/storage && \
-    chmod -R 775 /var/www/html/storage
-    
-RUN chown -R www-data:www-data storage bootstrap/cache && \
-    chmod -R 775 storage bootstrap/cache && \
-    php artisan storage:link
+    chown -R www-data:www-data /var/www/html/storage/app/public && \
+    chmod -R 775 /var/www/html/storage/app/public
+
+# --- Aquí es seguro ejecutar Artisan ---
+# Generar el enlace simbólico de storage
+RUN php artisan storage:link
+
+# Limpiar cachés usando driver de array (no requiere DB)
+RUN php artisan config:clear && \
+    php artisan cache:clear --no-interaction --env=local && \
+    php artisan view:clear
 
 EXPOSE 8080
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
