@@ -4,8 +4,9 @@ FROM composer:2 as builder
 WORKDIR /app
 COPY . .
 
-# Crea el directorio bootstrap/cache con permisos antes de composer install
+# Asegura que existan los directorios críticos
 RUN mkdir -p /app/bootstrap/cache && \
+    mkdir -p /app/resources/views && \
     chmod -R 775 /app/bootstrap/cache && \
     composer install --no-dev --optimize-autoloader
 
@@ -29,7 +30,13 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY --from=builder /app /var/www/html
 
-# Permisos (ahora solo para producción)
+# Crear estructura de directorios esencial
+RUN mkdir -p /var/www/html/storage/framework/views && \
+    mkdir -p /var/www/html/resources/views && \
+    touch /var/www/html/resources/views/.keep && \
+    touch /var/www/html/storage/framework/views/.keep
+
+# Permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -38,10 +45,8 @@ ENV CACHE_DRIVER=array \
     SESSION_DRIVER=array \
     QUEUE_CONNECTION=sync
 
-# Comandos artisan seguros
-RUN php artisan config:clear && \
-    php artisan view:clear && \
-    php artisan storage:link
+# Comandos artisan seguros (simplificados)
+RUN php artisan storage:link
 
 EXPOSE 8080
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
