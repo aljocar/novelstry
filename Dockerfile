@@ -38,13 +38,17 @@ RUN mkdir -p /var/www/html/storage/app/public/defaults && \
     chmod -R 775 /var/www/html/storage/app/public
 
 # --- Aquí es seguro ejecutar Artisan ---
-# Generar el enlace simbólico de storage
-RUN php artisan storage:link
+# Configuración temporal para comandos artisan durante el build
+ENV CACHE_DRIVER=array \
+    SESSION_DRIVER=array \
+    QUEUE_CONNECTION=sync
 
-# Limpiar cachés usando driver de array (no requiere DB)
+# Comandos artisan que NO requieren DB
 RUN php artisan config:clear && \
-    php artisan cache:clear --no-interaction --env=local && \
     php artisan view:clear
+
+# Opcional: Si realmente necesitas cache:clear, usa esta versión
+RUN php artisan cache:clear --no-interaction 2>/dev/null || true
 
 EXPOSE 8080
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
