@@ -38,6 +38,19 @@
 
     <h1 class="mb-4">Inicio</h1>
 
+    <div>
+        @if (env('APP_DEBUG'))
+            <div class="debug-info" style="background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;">
+                <h4>Debug: Variables de Imgur</h4>
+                <pre>{{ print_r($imgurVars, true) }}</pre>
+
+                <h4>Variables de entorno cargadas:</h4>
+                <pre>IMGUR_CLIENT_ID: {{ env('IMGUR_CLIENT_ID', 'No encontrado') }}</pre>
+                <pre>IMGUR_CLIENT_SECRET: {{ env('IMGUR_CLIENT_SECRET', 'No encontrado') }}</pre>
+            </div>
+        @endif
+    </div>
+
     <div class="container">
 
         <div class="row">
@@ -53,9 +66,9 @@
                                     <a href="{{ route('novels.show', $novel) }}" class="text-decoration-none text-dark">
                                         <div class="card h-100">
                                             @if ($novel->cover_image)
-                                                <img src="{{ $novel->cover_image }}"
-                                                    class="card-img-top img-fluid" alt="{{ $novel->title }}"
-                                                    style="max-width: 100%;" width="625" height="1000">
+                                                <img src="{{ $novel->cover_image }}" class="card-img-top img-fluid"
+                                                    alt="{{ $novel->title }}" style="max-width: 100%;" width="625"
+                                                    height="1000">
                                             @else
                                                 <img src="https://via.placeholder.com/150" class="card-img-top img-fluid"
                                                     alt="Portada no disponible" style="height: 150px; object-fit: cover;">
@@ -100,9 +113,8 @@
                                 <div class="carousel-inner">
                                     @foreach ($novels as $novel)
                                         <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                            <img src="{{ $novel->cover_image }}"
-                                                class="d-block w-100" alt="{{ $novel->title }}"
-                                                style="height: 400px; object-fit: cover;">
+                                            <img src="{{ $novel->cover_image }}" class="d-block w-100"
+                                                alt="{{ $novel->title }}" style="height: 400px; object-fit: cover;">
                                             <div class="carousel-caption d-none d-md-block text-white text-shadow">
                                                 <h5 class="shadow-lg">{{ $novel->title }}</h5>
                                                 @if ($novel->latestChapter)
