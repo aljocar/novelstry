@@ -34,10 +34,6 @@ ENV CACHE_DRIVER=array \
     SESSION_DRIVER=array \
     QUEUE_CONNECTION=sync
 
-# Configuración de variables de entorno
-ENV IMGUR_CLIENT_ID=495d931367a71e3 \
-    IMGUR_CLIENT_SECRET=abfa00ca67ccb449897fd9ae74e4701a72fec04e
-
 # Comandos artisan seguros
 RUN php artisan config:clear && \
     php artisan view:clear && \
