@@ -27,12 +27,6 @@ class HomeController extends Controller
             ->take(5)
             ->get();
 
-        // Obtener variables de Imgur
-        $imgurVars = [
-            'client_id' => env('IMGUR_CLIENT_ID', 'No configurado'),
-            'client_secret' => env('IMGUR_CLIENT_SECRET', 'No configurado')
-        ];
-
-        return view('home', compact('novels', 'topNovels', 'imgurVars'));
+        return view('home', compact('novels', 'topNovels'));
     }
 }
