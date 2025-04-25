@@ -45,7 +45,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <p class="mb-1">
-                                    <a href="{{ route('profiles.show', $novel->user->username) }}" class="text-black">
+                                    <a href="{{ route('profiles.show', $comment->user->username) }}" class="text-black">
                                         <img src="{{ $comment->user->profile_image }}"
                                             class="img-fluid shadow" width="30px" alt="Imagen de Perfil">
                                         <strong>{{ $comment->user->username }}</strong>

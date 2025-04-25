@@ -10,50 +10,24 @@ class ImgurService
     public function uploadBase64Image(string $base64Image): ?string
     {
         try {
-            // Verificar si la imagen está vacía
-            if (empty($base64Image)) {
-                throw new \Exception("La imagen está vacía");
+            // Limpia el encabezado de la imagen base64 si está presente
+            if (str_starts_with($base64Image, 'data:image')) {
+                $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
             }
 
-            // Limpiar encabezado
-            $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
-
-            $client = new \GuzzleHttp\Client([
-                'base_uri' => 'https://api.imgur.com/3/',
-                'headers' => [
-                    'Authorization' => 'Client-ID ' . config('services.imgur.client_id'),
-                    'Accept' => 'application/json',
-                ],
-                'timeout' => 15,
+            $response = Http::withHeaders([
+                'Authorization' => 'Client-ID ' . config('services.imgur.client_id'),
+            ])->timeout(15)->post('https://api.imgur.com/3/image', [
+                'image' => $base64Image,
+                'type' => 'base64'
             ]);
 
-            $response = $client->post('image', [
-                'form_params' => [
-                    'image' => $base64Image,
-                    'type' => 'base64'
-                ]
-            ]);
+            return $response->successful() 
+                ? $response->json()['data']['link']
+                : null;
 
-            $data = json_decode($response->getBody(), true);
-
-            if ($response->getStatusCode() !== 200 || !isset($data['data']['link'])) {
-                Log::error('Imgur API Error', [
-                    'status' => $response->getStatusCode(),
-                    'response' => $data
-                ]);
-                return null;
-            }
-
-            return $data['data']['link'];
-
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            Log::error('Imgur Request Error', [
-                'message' => $e->getMessage(),
-                'response' => $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null
-            ]);
-            return null;
         } catch (\Exception $e) {
-            Log::error('Imgur Service Error', ['message' => $e->getMessage()]);
+            Log::error('ImgurService Error: ' . $e->getMessage());
             return null;
         }
     }
