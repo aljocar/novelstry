@@ -13,9 +13,17 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserMetadataController;
+use App\Services\ImgurService;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/test-imgur', function() {
+    $testImage = base64_encode(file_get_contents('https://picsum.photos/200/300'));
+    $imgur = app(ImgurService::class);
+    $url = $imgur->uploadBase64Image($testImage);
+    return $url ?: "Error al subir imagen";
+});
 
 // Novelas (protegidas)
 Route::middleware('auth')->group(function () {
