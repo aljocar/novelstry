@@ -25,7 +25,6 @@
                     <th scope="col">ID</th>
                     <th scope="col">Nombre de Usuario</th>
                     <th scope="col">Tipo de Usuario</th>
-                    <th scope="col">Imagen de Perfil</th>
                     <th scope="col">Novelas</th>
                     <th scope="col">Accion</th>
                 </tr>
@@ -44,7 +43,6 @@
                                 Desconocido
                             @endif
                         </td>
-                        <td>{{ $user->profile_image }}</td>
                         <td>{{ $user->novels_count }}</td> <!-- Muestra el número de novelas asociadas -->
                         <td>
                             <div class="d-flex gap-2">
